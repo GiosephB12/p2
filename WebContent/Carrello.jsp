@@ -23,7 +23,7 @@
 		<tr>
 			<th></th>
 			<th>Nome</th>
-			<th>Quantit‡</th>
+			<th>Quantit√†</th>
 			<th>Prezzo totale</th>
 			<th></th>
 		</tr>
