@@ -29,7 +29,7 @@ public class RicercaProdottoServlet extends HttpServlet {
 		
 		String query = request.getParameter("query");
 		
-		ArrayList<ProdottoBean> risultato = new ArrayList<>();
+		ArrayList<ProdottoBean> risultato = new ArrayList<ProdottoBean>();
 		ProdottoDao dao = new ProdottoDao();
 		ArrayList<ProdottoBean> prodotti;
 		

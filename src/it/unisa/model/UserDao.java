@@ -32,7 +32,6 @@ public class UserDao implements UserDaoInterfaccia {
 	private static final String TABLE_NAME = "cliente";
 	
 	
-	@Override
 	public synchronized void doSave(UserBean user) throws SQLException {
 		
 		Connection connection = null;
@@ -73,7 +72,6 @@ public class UserDao implements UserDaoInterfaccia {
 	}
 
 
-	@Override
 	public synchronized UserBean doRetrieve(String username, String password) throws SQLException {
 		//preparing some objects for connecNon 
 		Connection connection = null;
@@ -132,7 +130,6 @@ public class UserDao implements UserDaoInterfaccia {
 		return user;
 	}
 	
-	@Override
 	public synchronized ArrayList<UserBean> doRetrieveAll(String order) throws SQLException {
 	
 		Connection connection = null;

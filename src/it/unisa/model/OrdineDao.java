@@ -31,7 +31,6 @@ public class OrdineDao implements OrdineDaoInterfaccia {
 	private static final String TABLE_NAME = "ordine";
 
 	
-	@Override
 	public synchronized void doSave(OrdineBean ordine) throws SQLException {
 
 		Connection connection = null;
@@ -72,7 +71,6 @@ public class OrdineDao implements OrdineDaoInterfaccia {
 	}
 
 	
-	@Override
 	public synchronized OrdineBean doRetrieveByKey(int idOrdine) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -116,7 +114,6 @@ public class OrdineDao implements OrdineDaoInterfaccia {
 	}
 	
 	
-	@Override
 	public synchronized ArrayList<OrdineBean> doRetrieveByEmail(String email) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -161,7 +158,6 @@ public class OrdineDao implements OrdineDaoInterfaccia {
 	}
 	
 	
-	@Override
 	public synchronized ArrayList<OrdineBean> doRetrieveAll(String order) throws SQLException {
 	
 		Connection connection = null;

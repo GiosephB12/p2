@@ -26,7 +26,7 @@ public class HomeServlet extends HttpServlet {
 		
 		ProdottoDao dao = new ProdottoDao();
 		
-		ArrayList<ArrayList<ProdottoBean>> categorie = new ArrayList<>();
+		ArrayList<ArrayList<ProdottoBean>> categorie = new ArrayList<ArrayList<ProdottoBean>>();
 		String redirectedPage = request.getParameter("page");
 		
 		try {

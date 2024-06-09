@@ -29,7 +29,6 @@ public class IndirizzoSpedizioneDao implements IndirizzoSpedizioneDaoInterfaccia
 	private static final String TABLE_NAME = "indirizzo_spedizione";
 
 	
-	@Override
 	public synchronized void doSave(IndirizzoSpedizioneBean bean) throws SQLException {
 
 		Connection connection = null;
@@ -48,7 +47,7 @@ public class IndirizzoSpedizioneDao implements IndirizzoSpedizioneDaoInterfaccia
 			preparedStatement.setString(4, bean.getProvincia());
 			preparedStatement.setString(5, bean.getNome());
 			preparedStatement.setString(6, bean.getCognome());
-			preparedStatement.setString(7, bean.getCittà());
+			preparedStatement.setString(7, bean.getCitta());
 
 
 			preparedStatement.executeUpdate();
@@ -68,7 +67,6 @@ public class IndirizzoSpedizioneDao implements IndirizzoSpedizioneDaoInterfaccia
 	}
 
 	
-	@Override
 	public synchronized IndirizzoSpedizioneBean doRetrieveByKey(String indirizzo, String cap) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -91,7 +89,7 @@ public class IndirizzoSpedizioneDao implements IndirizzoSpedizioneDaoInterfaccia
 				bean.setProvincia(rs.getString("PROVINCIA"));
 				bean.setNome(rs.getString("NOME"));
 				bean.setCognome(rs.getString("COGNOME"));
-				bean.setCittà(rs.getString("CITTA"));
+				bean.setCitta(rs.getString("CITTA"));
 				bean.setIndirizzo(rs.getString("INDIRIZZO"));
 				bean.setCap(rs.getString("CAP"));
 

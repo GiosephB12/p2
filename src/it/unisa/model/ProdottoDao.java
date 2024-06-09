@@ -31,7 +31,6 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 	
 	private static final String TABLE_NAME = "prodotto";
 
-	@Override
 	public synchronized void doSave(ProdottoBean product) throws SQLException {
 
 		Connection connection = null;
@@ -48,7 +47,7 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 			preparedStatement.setString(2, product.getPiattaforma());
 			preparedStatement.setString(3, product.getDescrizione());
 			preparedStatement.setDouble(4, product.getPrezzo());
-			preparedStatement.setInt(5, product.getQuantità());
+			preparedStatement.setInt(5, product.getQuantita());
 			preparedStatement.setString(6,product.getGenere());
 			preparedStatement.setString(7, product.getDataUscita());
 			preparedStatement.setBoolean(8, product.isInVendita());
@@ -71,7 +70,6 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 		}
 	}
 
-	@Override
 	public synchronized ProdottoBean doRetrieveByKey(int idProdotto) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -92,7 +90,7 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 				bean.setNome(rs.getString("NOME"));
 				bean.setDescrizione(rs.getString("DESCRIZIONE"));
 				bean.setPrezzo(rs.getDouble("PREZZO"));
-				bean.setQuantità(rs.getInt("QUANTITA"));
+				bean.setQuantita(rs.getInt("QUANTITA"));
 				bean.setPiattaforma(rs.getString("PIATTAFORMA"));
 				bean.setIva(rs.getString("IVA"));
 				bean.setDataUscita(rs.getString("DATA_USCITA"));
@@ -116,7 +114,6 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 		return bean;
 	}
 
-	@Override
 	public synchronized boolean doDelete(int idProdotto) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -144,7 +141,6 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 		return (result != 0);
 	}
 
-	@Override
 	public synchronized ArrayList<ProdottoBean> doRetrieveAll(String order) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -170,7 +166,7 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 				bean.setNome(rs.getString("NOME"));
 				bean.setDescrizione(rs.getString("DESCRIZIONE"));
 				bean.setPrezzo(rs.getDouble("PREZZO"));
-				bean.setQuantità(rs.getInt("QUANTITA"));
+				bean.setQuantita(rs.getInt("QUANTITA"));
 				bean.setPiattaforma(rs.getString("PIATTAFORMA"));
 				bean.setIva(rs.getString("IVA"));
 				bean.setDataUscita(rs.getString("DATA_USCITA"));
@@ -194,7 +190,6 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 		return products;
 	}
 	
-	@Override
 	public synchronized void doUpdateQnt(int id, int qnt) throws SQLException {
 
 		Connection connection = null;
@@ -241,7 +236,7 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 			connection.setAutoCommit(false);
 			preparedStatement = connection.prepareStatement(updateSQL);
 			preparedStatement.setString(1, product.getNome());
-			preparedStatement.setInt(2, product.getQuantità());
+			preparedStatement.setInt(2, product.getQuantita());
 			preparedStatement.setString(3, product.getPiattaforma());
 			preparedStatement.setString(4, product.getDescrizione());
 			preparedStatement.setDouble(5, product.getPrezzo());
@@ -269,12 +264,11 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 		}
 	}
 	
-	@Override
 	public synchronized ArrayList<ProdottoBean> doRetrieveByPiattaforma(String piattaforma) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 
-		ArrayList<ProdottoBean> prodotti = new ArrayList<>();
+		ArrayList<ProdottoBean> prodotti = new ArrayList<ProdottoBean>();
 
 		String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME + " WHERE PIATTAFORMA = ?";
 
@@ -291,7 +285,7 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 				bean.setNome(rs.getString("NOME"));
 				bean.setDescrizione(rs.getString("DESCRIZIONE"));
 				bean.setPrezzo(rs.getDouble("PREZZO"));
-				bean.setQuantità(rs.getInt("QUANTITA"));
+				bean.setQuantita(rs.getInt("QUANTITA"));
 				bean.setPiattaforma(rs.getString("PIATTAFORMA"));
 				bean.setIva(rs.getString("IVA"));
 				bean.setDataUscita(rs.getString("DATA_USCITA"));

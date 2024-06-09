@@ -29,7 +29,6 @@ public class MetodoPagamentoDao implements MetodoPagamentoDaoInterfaccia{
 	private static final String TABLE_NAME = "metodo_pagamento";
 
 	
-	@Override
 	public synchronized void doSave(MetodoPagamentoBean bean) throws SQLException {
 
 		Connection connection = null;
@@ -64,7 +63,6 @@ public class MetodoPagamentoDao implements MetodoPagamentoDaoInterfaccia{
 	}
 
 	
-	@Override
 	public synchronized MetodoPagamentoBean doRetrieveByKey(String numeroCarta) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
