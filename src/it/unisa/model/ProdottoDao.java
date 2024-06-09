@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -33,284 +31,191 @@ public class ProdottoDao implements ProdottoDaoInterfaccia{
 
 	public synchronized void doSave(ProdottoBean product) throws SQLException {
 
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(
+	                 "INSERT INTO " + ProdottoDao.TABLE_NAME
+	                         + " (NOME, PIATTAFORMA, DESCRIZIONE, PREZZO, QUANTITA, GENERE, DATA_USCITA, IN_VENDITA, IVA, IMMAGINE, DESCRIZIONE_DETTAGLIATA) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
 
-		String insertSQL = "INSERT INTO " + ProdottoDao.TABLE_NAME
-				+ " (NOME, PIATTAFORMA, DESCRIZIONE, PREZZO, QUANTITA, GENERE, DATA_USCITA, IN_VENDITA, IVA, IMMAGINE, DESCRIZIONE_DETTAGLIATA) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+	        preparedStatement.setString(1, product.getNome());
+	        preparedStatement.setString(2, product.getPiattaforma());
+	        preparedStatement.setString(3, product.getDescrizione());
+	        preparedStatement.setDouble(4, product.getPrezzo());
+	        preparedStatement.setInt(5, product.getQuantita());
+	        preparedStatement.setString(6, product.getGenere());
+	        preparedStatement.setString(7, product.getDataUscita());
+	        preparedStatement.setBoolean(8, product.isInVendita());
+	        preparedStatement.setString(9, product.getIva());
+	        preparedStatement.setString(10, product.getImmagine());
+	        preparedStatement.setString(11, product.getDescrizioneDettagliata());
 
-		try {
-			connection = ds.getConnection();
-			connection.setAutoCommit(false);
-			preparedStatement = connection.prepareStatement(insertSQL);
-			preparedStatement.setString(1, product.getNome());
-			preparedStatement.setString(2, product.getPiattaforma());
-			preparedStatement.setString(3, product.getDescrizione());
-			preparedStatement.setDouble(4, product.getPrezzo());
-			preparedStatement.setInt(5, product.getQuantita());
-			preparedStatement.setString(6,product.getGenere());
-			preparedStatement.setString(7, product.getDataUscita());
-			preparedStatement.setBoolean(8, product.isInVendita());
-			preparedStatement.setString(9, product.getIva());
-			preparedStatement.setString(10, product.getImmagine());
-			preparedStatement.setString(11, product.getDescrizioneDettagliata());
-
-
-			preparedStatement.executeUpdate();
-
-			connection.commit();
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
+	        preparedStatement.executeUpdate();
+	    }
 	}
 
 	public synchronized ProdottoBean doRetrieveByKey(int idProdotto) throws SQLException {
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    ProdottoBean bean = null;
 
-		ProdottoBean bean = new ProdottoBean();
+	    String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME + " WHERE ID_PRODOTTO = ?";
 
-		String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME + " WHERE ID_PRODOTTO = ?";
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
-		try {
-			connection = ds.getConnection();
-			preparedStatement = connection.prepareStatement(selectSQL);
-			preparedStatement.setInt(1, idProdotto);
+	        preparedStatement.setInt(1, idProdotto);
 
-			ResultSet rs = preparedStatement.executeQuery();
+	        try (ResultSet rs = preparedStatement.executeQuery()) {
+	            if (rs.next()) {
+	                bean = new ProdottoBean();
+	                bean.setIdProdotto(rs.getInt("ID_PRODOTTO"));
+	                bean.setNome(rs.getString("NOME"));
+	                bean.setDescrizione(rs.getString("DESCRIZIONE"));
+	                bean.setPrezzo(rs.getDouble("PREZZO"));
+	                bean.setQuantita(rs.getInt("QUANTITA"));
+	                bean.setPiattaforma(rs.getString("PIATTAFORMA"));
+	                bean.setIva(rs.getString("IVA"));
+	                bean.setDataUscita(rs.getString("DATA_USCITA"));
+	                bean.setInVendita(rs.getBoolean("IN_VENDITA"));
+	                bean.setImmagine(rs.getString("IMMAGINE"));
+	                bean.setGenere(rs.getString("GENERE"));
+	                bean.setDescrizioneDettagliata(rs.getString("DESCRIZIONE_DETTAGLIATA"));
+	            }
+	        }
+	    }
 
-			while (rs.next()) {
-				bean.setIdProdotto(rs.getInt("ID_PRODOTTO"));
-				bean.setNome(rs.getString("NOME"));
-				bean.setDescrizione(rs.getString("DESCRIZIONE"));
-				bean.setPrezzo(rs.getDouble("PREZZO"));
-				bean.setQuantita(rs.getInt("QUANTITA"));
-				bean.setPiattaforma(rs.getString("PIATTAFORMA"));
-				bean.setIva(rs.getString("IVA"));
-				bean.setDataUscita(rs.getString("DATA_USCITA"));
-				bean.setInVendita(rs.getBoolean("IN_VENDITA"));
-				bean.setImmagine(rs.getString("IMMAGINE"));
-				bean.setGenere(rs.getString("GENERE"));
-				bean.setDescrizioneDettagliata(rs.getString("DESCRIZIONE_DETTAGLIATA"));
-
-
-			}
-
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
-		return bean;
+	    return bean;
 	}
+
 
 	public synchronized boolean doDelete(int idProdotto) throws SQLException {
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    int result = 0;
 
-		int result = 0;
+	    String deleteSQL = "DELETE FROM " + ProdottoDao.TABLE_NAME + " WHERE ID_PRODOTTO = ?";
 
-		String deleteSQL = "DELETE FROM " + ProdottoDao.TABLE_NAME + " WHERE ID_PRODOTTO = ?";
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
 
-		try {
-			connection = ds.getConnection();
-			preparedStatement = connection.prepareStatement(deleteSQL);
-			preparedStatement.setInt(1, idProdotto);
+	        preparedStatement.setInt(1, idProdotto);
 
-			result = preparedStatement.executeUpdate();
+	        result = preparedStatement.executeUpdate();
+	    }
 
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
-		return (result != 0);
+	    return (result != 0);
 	}
+
 
 	public synchronized ArrayList<ProdottoBean> doRetrieveAll(String order) throws SQLException {
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    ArrayList<ProdottoBean> products = new ArrayList<>();
 
-		ArrayList<ProdottoBean> products = new ArrayList<ProdottoBean>();
+	    String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME;
 
-		String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME;
+	    if (order != null && !order.equals("")) {
+	        // Controllo aggiunto per evitare SQL injection
+	        if (order.matches("[a-zA-Z_]+")) {
+	            selectSQL += " ORDER BY " + order;
+	        } else {
+	            // In caso di ordine non valido, si può gestire in modo diverso, ad esempio ignorare o impostare un ordine predefinito
+	            // Qui ho scelto di non aggiungere l'ordine per evitare possibili attacchi di SQL injection
+	        }
+	    }
 
-		if (order != null && !order.equals("")) {
-			selectSQL += " ORDER BY " + order;
-		}
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
-		try {
-			connection = ds.getConnection();
-			preparedStatement = connection.prepareStatement(selectSQL);
+	        ResultSet rs = preparedStatement.executeQuery();
 
-			ResultSet rs = preparedStatement.executeQuery();
+	        while (rs.next()) {
+	            ProdottoBean bean = new ProdottoBean();
 
-			while (rs.next()) {
-				ProdottoBean bean = new ProdottoBean();
+	            bean.setIdProdotto(rs.getInt("ID_PRODOTTO"));
+	            bean.setNome(rs.getString("NOME"));
+	            bean.setDescrizione(rs.getString("DESCRIZIONE"));
+	            bean.setPrezzo(rs.getDouble("PREZZO"));
+	            bean.setQuantita(rs.getInt("QUANTITA"));
+	            bean.setPiattaforma(rs.getString("PIATTAFORMA"));
+	            bean.setIva(rs.getString("IVA"));
+	            bean.setDataUscita(rs.getString("DATA_USCITA"));
+	            bean.setInVendita(rs.getBoolean("IN_VENDITA"));
+	            bean.setImmagine(rs.getString("IMMAGINE"));
+	            bean.setGenere(rs.getString("GENERE"));
+	            bean.setDescrizioneDettagliata(rs.getString("DESCRIZIONE_DETTAGLIATA"));
 
-				bean.setIdProdotto(rs.getInt("ID_PRODOTTO"));
-				bean.setNome(rs.getString("NOME"));
-				bean.setDescrizione(rs.getString("DESCRIZIONE"));
-				bean.setPrezzo(rs.getDouble("PREZZO"));
-				bean.setQuantita(rs.getInt("QUANTITA"));
-				bean.setPiattaforma(rs.getString("PIATTAFORMA"));
-				bean.setIva(rs.getString("IVA"));
-				bean.setDataUscita(rs.getString("DATA_USCITA"));
-				bean.setInVendita(rs.getBoolean("IN_VENDITA"));
-				bean.setImmagine(rs.getString("IMMAGINE"));
-				bean.setGenere(rs.getString("GENERE"));
-				bean.setDescrizioneDettagliata(rs.getString("DESCRIZIONE_DETTAGLIATA"));
+	            products.add(bean);
+	        }
+	    }
 
-				products.add(bean);
-			}
-
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
-		return products;
+	    return products;
 	}
-	
+
+    
 	public synchronized void doUpdateQnt(int id, int qnt) throws SQLException {
+	    String updateSQL = "UPDATE " + ProdottoDao.TABLE_NAME
+	            + " SET QUANTITA = ? "
+	            + " WHERE ID_PRODOTTO = ? ";
 
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
 
-		String updateSQL = "UPDATE " + ProdottoDao.TABLE_NAME
-				+ " SET QUANTITA = ? "
-				+ " WHERE ID_PRODOTTO = ? ";
+	        preparedStatement.setInt(1, qnt);
+	        preparedStatement.setInt(2, id);
 
-		try {
-			connection = ds.getConnection();
-			connection.setAutoCommit(false);
-			preparedStatement = connection.prepareStatement(updateSQL);
-			preparedStatement.setInt(1, qnt);
-			preparedStatement.setInt(2, id);
-
-			
-
-			preparedStatement.executeUpdate();
-
-			connection.commit();
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
+	        preparedStatement.executeUpdate();
+	    }
 	}
 	
 	public synchronized void doUpdate(ProdottoBean product) throws SQLException {
+	    String updateSQL = "UPDATE " + ProdottoDao.TABLE_NAME
+	            + " SET NOME = ? , QUANTITA = ? , PIATTAFORMA = ?, DESCRIZIONE = ?, PREZZO = ?, GENERE = ?, DATA_USCITA = ?, IN_VENDITA = ?, IVA = ?, IMMAGINE = ?, DESCRIZIONE_DETTAGLIATA = ?"
+	            + " WHERE ID_PRODOTTO = ? ";
 
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
 
-		String updateSQL = "UPDATE " + ProdottoDao.TABLE_NAME
-				+ " SET NOME = ? , QUANTITA = ? , PIATTAFORMA = ?, DESCRIZIONE = ?, PREZZO = ?, GENERE = ?, DATA_USCITA = ?, IN_VENDITA = ?, IVA = ?, IMMAGINE = ?, DESCRIZIONE_DETTAGLIATA = ?"
-				+ " WHERE ID_PRODOTTO = ? ";
+	        preparedStatement.setString(1, product.getNome());
+	        preparedStatement.setInt(2, product.getQuantita());
+	        preparedStatement.setString(3, product.getPiattaforma());
+	        preparedStatement.setString(4, product.getDescrizione());
+	        preparedStatement.setDouble(5, product.getPrezzo());
+	        preparedStatement.setString(6,product.getGenere());
+	        preparedStatement.setString(7, product.getDataUscita());
+	        preparedStatement.setBoolean(8, product.isInVendita());
+	        preparedStatement.setString(9, product.getIva());
+	        preparedStatement.setString(10, product.getImmagine());
+	        preparedStatement.setString(11, product.getDescrizioneDettagliata());
+	        preparedStatement.setInt(12, product.getIdProdotto());
 
-		try {
-			connection = ds.getConnection();
-			connection.setAutoCommit(false);
-			preparedStatement = connection.prepareStatement(updateSQL);
-			preparedStatement.setString(1, product.getNome());
-			preparedStatement.setInt(2, product.getQuantita());
-			preparedStatement.setString(3, product.getPiattaforma());
-			preparedStatement.setString(4, product.getDescrizione());
-			preparedStatement.setDouble(5, product.getPrezzo());
-			preparedStatement.setString(6,product.getGenere());
-			preparedStatement.setString(7, product.getDataUscita());
-			preparedStatement.setBoolean(8, true);
-			preparedStatement.setString(9, product.getIva());
-			preparedStatement.setString(10, product.getImmagine());
-			preparedStatement.setString(11, product.getDescrizioneDettagliata());
-			preparedStatement.setInt(12, product.getIdProdotto());
-
-			
-
-			preparedStatement.executeUpdate();
-
-			connection.commit();
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
+	        preparedStatement.executeUpdate();
+	    }
 	}
+
 	
 	public synchronized ArrayList<ProdottoBean> doRetrieveByPiattaforma(String piattaforma) throws SQLException {
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    ArrayList<ProdottoBean> prodotti = new ArrayList<ProdottoBean>();
+	    String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME + " WHERE PIATTAFORMA = ?";
 
-		ArrayList<ProdottoBean> prodotti = new ArrayList<ProdottoBean>();
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
-		String selectSQL = "SELECT * FROM " + ProdottoDao.TABLE_NAME + " WHERE PIATTAFORMA = ?";
+	        preparedStatement.setString(1, piattaforma);
+	        try (ResultSet rs = preparedStatement.executeQuery()) {
+	            while (rs.next()) {
+	                ProdottoBean bean = new ProdottoBean();
+	                bean.setIdProdotto(rs.getInt("ID_PRODOTTO"));
+	                bean.setNome(rs.getString("NOME"));
+	                bean.setDescrizione(rs.getString("DESCRIZIONE"));
+	                bean.setPrezzo(rs.getDouble("PREZZO"));
+	                bean.setQuantita(rs.getInt("QUANTITA"));
+	                bean.setPiattaforma(rs.getString("PIATTAFORMA"));
+	                bean.setIva(rs.getString("IVA"));
+	                bean.setDataUscita(rs.getString("DATA_USCITA"));
+	                bean.setInVendita(rs.getBoolean("IN_VENDITA"));
+	                bean.setImmagine(rs.getString("IMMAGINE"));
+	                bean.setGenere(rs.getString("GENERE"));
+	                bean.setDescrizioneDettagliata(rs.getString("DESCRIZIONE_DETTAGLIATA"));
 
-		try {
-			connection = ds.getConnection();
-			preparedStatement = connection.prepareStatement(selectSQL);
-			preparedStatement.setString(1, piattaforma);
-
-			ResultSet rs = preparedStatement.executeQuery();
-
-			while (rs.next()) {
-				ProdottoBean bean = new ProdottoBean();
-				bean.setIdProdotto(rs.getInt("ID_PRODOTTO"));
-				bean.setNome(rs.getString("NOME"));
-				bean.setDescrizione(rs.getString("DESCRIZIONE"));
-				bean.setPrezzo(rs.getDouble("PREZZO"));
-				bean.setQuantita(rs.getInt("QUANTITA"));
-				bean.setPiattaforma(rs.getString("PIATTAFORMA"));
-				bean.setIva(rs.getString("IVA"));
-				bean.setDataUscita(rs.getString("DATA_USCITA"));
-				bean.setInVendita(rs.getBoolean("IN_VENDITA"));
-				bean.setImmagine(rs.getString("IMMAGINE"));
-				bean.setGenere(rs.getString("GENERE"));
-				bean.setDescrizioneDettagliata(rs.getString("DESCRIZIONE_DETTAGLIATA"));
-				
-				prodotti.add(bean);
-
-
-			}
-
-		} finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
-		return prodotti;
-	}
-	
-	
+	                prodotti.add(bean);
+	            }
+	        }
+	    }
+	    return prodotti;
+	}	
 
 }

@@ -32,45 +32,25 @@ public class OrdineDao implements OrdineDaoInterfaccia {
 
 	
 	public synchronized void doSave(OrdineBean ordine) throws SQLException {
+	    String insertSQL = "INSERT INTO " + OrdineDao.TABLE_NAME
+	            + " (EMAIL, IMPORTO_TOTALE, STATO, DATA_ORDINE, INDIRIZZO, CAP, CARTA_CREDITO, ID_ORDINE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-		Connection connection = null;
-		PreparedStatement preparedStatement = null;
+	    try (Connection connection = ds.getConnection();
+	         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
 
-		String insertSQL = "INSERT INTO " + OrdineDao.TABLE_NAME
-				+ " (EMAIL, IMPORTO_TOTALE, STATO, DATA_ORDINE, INDIRIZZO, CAP, CARTA_CREDITO, ID_ORDINE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	        preparedStatement.setString(1, ordine.getEmail());
+	        preparedStatement.setDouble(2, ordine.getImportoTotale());
+	        preparedStatement.setString(3, ordine.getStato());
+	        preparedStatement.setString(4, ordine.getData());
+	        preparedStatement.setString(5, ordine.getIndirizzo());
+	        preparedStatement.setString(6, ordine.getCap());
+	        preparedStatement.setString(7, ordine.getCartaCredito());
+	        preparedStatement.setInt(8, ordine.getIdOrdine());
 
-		try {
-			connection = ds.getConnection();
-			connection.setAutoCommit(false);
-			preparedStatement = connection.prepareStatement(insertSQL);
-			preparedStatement.setString(1, ordine.getEmail());
-			preparedStatement.setDouble(2, ordine.getImportoTotale());
-			preparedStatement.setString(3, ordine.getStato());
-			preparedStatement.setString(4, ordine.getData());
-			preparedStatement.setString(5, ordine.getIndirizzo());
-			preparedStatement.setString(6, ordine.getCap());
-			preparedStatement.setString(7, ordine.getCartaCredito());
-			preparedStatement.setInt(8, ordine.getIdOrdine());
-
-
-
-			preparedStatement.executeUpdate();
-
-			connection.commit();
-		} 
-		finally {
-			try {
-				if (preparedStatement != null)
-					preparedStatement.close();
-			} 
-			finally {
-				if (connection != null)
-					connection.close();
-			}
-		}
+	        preparedStatement.executeUpdate();
+	    }
 	}
 
-	
 	public synchronized OrdineBean doRetrieveByKey(int idOrdine) throws SQLException {
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
